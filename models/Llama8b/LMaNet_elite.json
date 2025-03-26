@@ -1,0 +1,68 @@
+{
+    "candidate_config": {
+            "input_channels": 3,
+            "blocks": [
+                {
+                    "output_channels": 16,
+                    "num_layers": 2,
+                    "kernel_size": 3,
+                    "stride": 2,
+                    "expansion_factor": 3,
+                    "use_se": false,
+                    "se_ratio": 0,
+                    "conv_type": "depthwise",
+                    "skip_op": "identity",
+                    "activation": "relu6"
+                },
+                {
+                    "output_channels": 32,
+                    "num_layers": 2,
+                    "kernel_size": 5,
+                    "stride": 2,
+                    "expansion_factor": 3,
+                    "use_se": false,
+                    "se_ratio": 0.25,
+                    "conv_type": "depthwise",
+                    "skip_op": "residual",
+                    "activation": "relu6"
+                },
+                {
+                    "output_channels": 48,
+                    "num_layers": 2,
+                    "kernel_size": 5,
+                    "stride": 2,
+                    "expansion_factor": 3,
+                    "use_se": false,
+                    "se_ratio": 0,
+                    "conv_type": "mbconv",
+                    "skip_op": "identity",
+                    "activation": "leakyrelu"
+                },
+                {
+                    "output_channels": 64,
+                    "num_layers": 3,
+                    "kernel_size": 3,
+                    "stride": 1,
+                    "expansion_factor": 3,
+                    "use_se": true,
+                    "se_ratio": 0.5,
+                    "conv_type": "mbconv",
+                    "skip_op": "identity",
+                    "activation": "relu6"
+                },
+                {
+                    "output_channels": 128,
+                    "num_layers": 3,
+                    "kernel_size": 7,
+                    "stride": 2,
+                    "expansion_factor": 3,
+                    "use_se": false,
+                    "se_ratio": 0,
+                    "conv_type": "mbconv",
+                    "skip_op": "identity",
+                    "activation": "relu6"
+                }
+            ]
+        }
+    }
+    

@@ -126,8 +126,7 @@ def initialize_llm():
 
     # model_name = "unsloth/Qwen2.5-3B-Instruct"
     # model_name = "unsloth/Llama-3.2-3B-Instruct" 
-    # model_name = "unsloth/Meta-Llama-3.1-8B-Instruct"
-    model_name = "unsloth/DeepSeek-R1-Distill-Llama-8B"
+    model_name = "unsloth/Meta-Llama-3.1-8B-Instruct"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,

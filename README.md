@@ -2,14 +2,14 @@
 
 ![Search process](imgs/process.png)
 
-<p align="center"><strong><span style="font-size:18px">(1) Search process</span></strong></p>
+<p align="center"><strong><span style="font-size:18px">(1) End-to-End Optimization Framework</span></strong></p>
 
 ![Search space](imgs/space.png)
 
 <p align="center"><strong><span style="font-size:18px">(2) Search space</span></strong></p>
 
 
-## 🚀 Overview
+## Overview
 This repository provides the official implementation of a novel framework for designing efficient neural network architectures tailored to **TinyML** platforms.
 
 We propose a unified pipeline that combines:
@@ -21,7 +21,7 @@ We propose a unified pipeline that combines:
 
 The goal is to achieve **high accuracy**, **low memory usage**, and **efficient computation**, specifically under **320 KB SRAM** and **<100M MACs**, suitable for deployment on resource-constrained MCUs such as the **STM32H7**.
 
-## 🧪 Results
+## Results
 Our framework produced three optimized models:
 
 | Model         | Accuracy (CIFAR-100) | MACs (M) | SRAM (KB) |
@@ -36,7 +36,7 @@ These outperform current state-of-the-art TinyML models on CIFAR-100:
 - MCUNet-in4: **72.86%**
 - XiNet: **72.27%**
 
-## 🛠️ TODO
+## 🛠️ TO-DO
 - [ ] Refactor code for modularity and documentation
 - [ ] Include automation scripts
 - [ ] Include object detection model support

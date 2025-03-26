@@ -2,11 +2,11 @@
 
 ![Search process](imgs/process.png)
 
-<p align="center"><strong><span style="font-size:18px">Figure: Search process</span></strong></p>
+<p align="center"><strong><span style="font-size:18px">(1) Search process</span></strong></p>
 
 ![Search space](imgs/space.png)
 
-<p align="center"><strong><span style="font-size:18px">Figure: Search space</span></strong></p>
+<p align="center"><strong><span style="font-size:18px">(2) Search space</span></strong></p>
 
 
 ## 🚀 Overview

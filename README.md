@@ -36,6 +36,8 @@ These outperform current state-of-the-art TinyML models on CIFAR-100:
 - MCUNet-in4: **72.86%**
 - XiNet: **72.27%**
 
+![Search process](imgs/peaksram.png)
+
 ## 🛠️ TO-DO
 - [ ] Refactor code for modularity and documentation
 - [ ] Include automation scripts

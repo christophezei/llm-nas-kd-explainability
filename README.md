@@ -48,11 +48,13 @@ These outperform current state-of-the-art TinyML models on CIFAR-100:
 If you use this repository in your research or product, please cite:
 
 ```bibtex
-@article{elzeinaty2024tinymlframework,
-  title={Can LLMs Revolutionize the Design of Explainable and Efficient TinyML Models?},
-  author = {El Zeinaty, Christophe and Hamidouche, Wassim and others},
-  journal={To appear soon},
-  year={2025}
+@inproceedings{elzeinaty2025tinymlframework,
+  title     = {Can {LLMs} Revolutionize the Design of Explainable and Efficient TinyML Models?},
+  author    = {El Zeinaty, Christophe and Hamidouche, Wassim and Herrou, Glenn and Menard, Daniel and Debbah, Merouane},
+  booktitle = {Proceedings of the International Joint Conference on Neural Networks (IJCNN)},
+  year      = {2025},
+  address   = {Rome, Italy},
+  note      = {To appear. Accepted for presentation in the Special Session on TinyML.},
 }
 ```
 

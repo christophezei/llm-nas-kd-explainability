@@ -44,6 +44,10 @@ These outperform current state-of-the-art TinyML models on CIFAR-100:
 - [ ] Include object detection model support
 - [ ] Add inference scripts for STM32H7 (TFLM)
 
+## 📄 Read the Paper
+
+[🔗 Click here to read the paper (PDF)](https://github.com/christophezei/llm-nas-kd-explainability/blob/main/main.pdf)
+
 ## 📄 Citation
 If you use this repository in your research or product, please cite:
 

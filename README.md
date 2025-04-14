@@ -41,6 +41,7 @@ These outperform current state-of-the-art TinyML models on CIFAR-100:
 ## 🛠️ TO-DO
 - [ ] Refactor code for modularity and documentation
 - [ ] Include automation scripts
+- [ ] Upload quantized weights
 - [ ] Include object detection model support
 - [ ] Add inference scripts for STM32H7 (TFLM)
 

@@ -132,6 +132,7 @@ def initialize_llm():
         model_name=model_name,
         max_seq_length=16384,
         load_in_4bit=False,
+        fix_tokenizer=False
         # trust_remote_code=True
     )
 
@@ -281,7 +282,7 @@ def extract_config_from_llm_response(response):
 # ===============================
 #      MACs Validation
 # ===============================
-def quick_validate_macs(candidate_config, min_mac, max_mac):
+def quick_validate_macs(candidate_config, min_mac, max_mac, num_classes=100, res=(3, 160, 160)):
     """
     Quickly validates if the candidate's MACs meet the specified minimum and maximum constraints.
 
@@ -297,10 +298,10 @@ def quick_validate_macs(candidate_config, min_mac, max_mac):
     """
     try:
         # Build the model from the configuration
-        candidate_model = LLMGenModel(candidate_config, num_classes=100, use_final_layer=False)
+        candidate_model = LLMGenModel(candidate_config, num_classes=num_classes)
 
         # Use ptflops to estimate MACs
-        input_res = (3, 160, 160)  # Define the input resolution
+        input_res = res
         macs, _ = get_model_complexity_info(candidate_model, input_res, as_strings=False, print_per_layer_stat=False)
         macs_millions = macs / 1e6
 
@@ -557,7 +558,7 @@ def mixup_criterion(criterion, pred, y_a, y_b, lam):
 
 def evaluate_model(
     model, train_loader, val_loader, test_loader, device="cuda", num_epochs=40, 
-    optimizer_type='SGD', lr=0.1, weight_decay=1e-5, mac_limit=400, 
+    optimizer_type='SGD', lr=0.1, weight_decay=1e-5, mac_limit=350, 
     baseline_acc=70, evaluation_phase='initial', is_mix_up=False, resume_trainig=False
 ):
     """
@@ -736,7 +737,7 @@ def evaluate_model(
 # ===============================
 
 def build_candidate_network_with_context_single_proposal(
-    llm_model, tokenizer, input_channels, input_size, num_blocks, search_space, answer_exp, iter_numb=0, feedback=None, max_retries=10
+    llm_model, tokenizer, input_channels, input_size, num_blocks, search_space, answer_exp, iter_numb=0, feedback=None, max_retries=10, mac_limit=350
 ):
     """
     Build a candidate network configuration by querying the LLM for the entire network in one go,
@@ -769,7 +770,7 @@ def build_candidate_network_with_context_single_proposal(
                 iter_numb=iter_numb,
                 feedback=feedback,
                 input_image_size=input_size,
-                mac_limit=350  # Ensure MAC limit is respected
+                mac_limit=mac_limit  # Ensure MAC limit is respected
             )
             messages = [{"role": "user", "content": prompt}]
             # Interact with the LLM to generate the entire network
@@ -918,7 +919,9 @@ def feedback_loop_single_proposal(
     num_blocks=5,
     max_iterations=100,
     experiment_name="Llma8b",
-    mac_limit=400,
+    min_mac = 70,
+    mac_limit=350,
+    
 ):
     """
     Feedback loop to iteratively generate and evaluate a single proposed network from the LLM
@@ -955,6 +958,7 @@ def feedback_loop_single_proposal(
     
     # Initialize the JSON file if it doesn't exist
     if not os.path.exists(all_candidates_path):
+        os.makedirs(f"{experiment_name}/", exist_ok=True)
         with open(all_candidates_path, "w") as f:
             json.dump([], f)
 
@@ -1004,7 +1008,7 @@ def feedback_loop_single_proposal(
             can_config = {'candidate_config': candidate_config}
             candidate_config_history.append(can_config)
 
-        min_mac = 70
+       
         valid_macs, estimated_macs = quick_validate_macs(candidate_config, min_mac=min_mac, max_mac=mac_limit)
         if not valid_macs:
             if estimated_macs < min_mac:
@@ -1020,7 +1024,7 @@ def feedback_loop_single_proposal(
         # Compute Peak SRAM usage
         sram = compute_peak_sram(candidate_model, (1, 3, 160, 160), dtype=torch.int8)
 
-        max_sram_limit = 0.4
+        max_sram_limit = 0.512
         # Validate Peak SRAM usage
         if sram > max_sram_limit:
             feedback = (
@@ -1079,10 +1083,10 @@ def feedback_loop_single_proposal(
                 best_metrics = metrics
 
                 # Save the best candidate's configuration and metrics
-                save_candidate(best_candidate, best_metrics, filename=f"{experiment_name}_best_candidate.json")
+                save_candidate(best_candidate, best_metrics, experiment_name=experiment_name, filename="best_candidate.json")
 
                 # Save the model's weights
-                torch.save(candidate_model.state_dict(), f"saved_candidates/feed/{experiment_name}_best_candidate.pth")
+                torch.save(candidate_model.state_dict(), f"{experiment_name}/{experiment_name}_best_candidate.pth")
 
                 print(f"New best candidate saved with test accuracy: {metrics['test_acc']:.2f}%")
                 
@@ -1096,9 +1100,7 @@ def feedback_loop_single_proposal(
             feedback = best_model_feedback + generate_pareto_feedback(pareto_set)
 
             print(f"Feedback prompt: {feedback}\n")
-            # Save the Pareto set
-            os.makedirs("saved_candidates/feed", exist_ok=True)
-            with open(f"saved_candidates/feed/{experiment_name}_pareto_set.json", "w") as f:
+            with open(f"{experiment_name}/{experiment_name}_pareto_set.json", "w") as f:
                 json.dump(pareto_set, f, indent=4)
         else:
             # Provide specific feedback on why the candidate was not promising
@@ -1137,7 +1139,7 @@ def query_llm_for_explanation(llm_model, tokenizer, candidate_config, query):
 #      Candidate Management
 # ===============================
 
-def save_candidate(candidate_config, metrics, filename="best_candidate.json"):
+def save_candidate(candidate_config, metrics, experiment_name, filename="best_candidate.json"):
     """
     Save the candidate configuration and metrics to a file.
 
@@ -1146,8 +1148,8 @@ def save_candidate(candidate_config, metrics, filename="best_candidate.json"):
         metrics (dict): Performance metrics of the candidate.
         filename (str): Name of the file to save the candidate.
     """
-    os.makedirs("saved_candidates/feed/", exist_ok=True)
-    filepath = os.path.join("saved_candidates/feed/", filename)
+    os.makedirs(f"{experiment_name}/", exist_ok=True)
+    filepath = os.path.join(f"{experiment_name}/", filename)
     data = {
         "candidate_config": candidate_config,
         "metrics": metrics
@@ -1155,7 +1157,6 @@ def save_candidate(candidate_config, metrics, filename="best_candidate.json"):
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4)
     print(f"Candidate saved to {filepath}")
-
 
 # ===============================
 #      Main Function
@@ -1257,6 +1258,7 @@ def main():
         num_blocks=5,  
         max_iterations=500,
         experiment_name="search_llama8b",
+        min_mac=70,
         mac_limit=350
     )
     print("\nBest Candidate Configuration:", best_candidate)

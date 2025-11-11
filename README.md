@@ -1,5 +1,5 @@
 # Can LLMs Revolutionize the Design of Explainable and Efficient TinyML Models? 
-# 🏆 Best Student Paper Award – IJCNN 2025 (Rome, Italy)
+## 🏆 Best Student Paper Award – IJCNN 2025 (Rome, Italy)
 
 ![Search process](imgs/process.png)
 
